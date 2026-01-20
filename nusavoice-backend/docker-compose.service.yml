@@ -1,0 +1,20 @@
+# Tambahkan service ini ke docker-compose.yml di server
+  # NusaVoice TTS Backend
+  nusavoice-backend:
+    build:
+      context: ./nusavoice-backend
+      dockerfile: Dockerfile
+    container_name: nusavoice-backend
+    restart: unless-stopped
+    env_file:
+      - ./nusavoice-backend/.env.production
+    volumes:
+      # Persist output files (optional - audio files are temporary anyway)
+      - ./nusavoice-backend/output:/app/output
+    labels:
+      - "traefik.enable=true"
+      # MAIN DOMAIN
+      - "traefik.http.routers.nusavoice-backend.rule=Host(`nusavoice-backend.pradanayahya.com`)"
+      - "traefik.http.routers.nusavoice-backend.entrypoints=websecure"
+      - "traefik.http.routers.nusavoice-backend.tls.certresolver=le"
+      - "traefik.http.services.nusavoice-backend.loadbalancer.server.port=8000"
